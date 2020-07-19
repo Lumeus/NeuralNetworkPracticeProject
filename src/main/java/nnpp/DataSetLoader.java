@@ -29,9 +29,12 @@ public class DataSetLoader {
     private static final int width = 360;//50;
     private static final int channels = 3;
 
-    public static String dataLocalPath;
-	
-    public DataSetIterator getData(String path) throws Exception {
+    private DataSetIterator trainIter;
+    private DataSetIterator testIter;
+    
+    public String dataLocalPath;
+    
+    public void loadData(String path) throws Exception {
     	
     	dataLocalPath = path;
     	
@@ -47,19 +50,27 @@ public class DataSetLoader {
         InputSplit trainData = filesInDirSplit[0];
         InputSplit testData = filesInDirSplit[1];
         
-        ImageRecordReader recordReader = new ImageRecordReader(height,width,channels,labelMaker);
+        ImageRecordReader trainRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
+        ImageRecordReader testRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
 
         ImageTransform transform = new MultiImageTransform(randNumGen,new ShowImageTransform("Display - before "));
 
-        recordReader.initialize(trainData,transform);
-        recordReader.initialize(testData,transform);
-        int outputNum = recordReader.numLabels();
+        trainRecordReader.initialize(trainData,transform);
+        testRecordReader.initialize(testData,transform);
+        int outputNum = trainRecordReader.numLabels();
         int batchSize = 128; // Minibatch size. Here: The number of images to fetch for each call to dataIter.next().
         int labelIndex = 1; // Index of the label Writable (usually an IntWritable), as obtained by recordReader.next()
         
-        DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, labelIndex, outputNum);
-    	
-    	return dataIter;
+        trainIter = new RecordReaderDataSetIterator(trainRecordReader, batchSize, labelIndex, outputNum);
+        testIter = new RecordReaderDataSetIterator(testRecordReader, batchSize, labelIndex, outputNum);
     }
-    
+
+    public DataSetIterator getTrainIter() {
+    	return trainIter;
+    }
+
+    public DataSetIterator getTestIter() {
+    	return testIter;
+    }
+	
 }

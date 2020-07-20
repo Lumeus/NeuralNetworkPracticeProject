@@ -7,9 +7,13 @@ import org.datavec.api.split.FileSplit;
 import org.datavec.api.split.InputSplit;
 import org.datavec.image.loader.BaseImageLoader;
 import org.datavec.image.recordreader.ImageRecordReader;
+import org.datavec.image.transform.CropImageTransform;
+import org.datavec.image.transform.FlipImageTransform;
 import org.datavec.image.transform.ImageTransform;
 import org.datavec.image.transform.MultiImageTransform;
+import org.datavec.image.transform.ScaleImageTransform;
 import org.datavec.image.transform.ShowImageTransform;
+import org.datavec.image.transform.WarpImageTransform;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 //import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -25,8 +29,8 @@ public class DataSetLoader {
 
     private static final Random randNumGen = new Random(seed);
 
-    private static final int height = 290;//50;
-    private static final int width = 360;//50;
+    private static final int height = 50;//290;//
+    private static final int width = 50;//360;//
     private static final int channels = 3;
 
     private DataSetIterator trainIter;
@@ -38,7 +42,7 @@ public class DataSetLoader {
     	
     	dataLocalPath = path;
     	
-    	File parentDir=new File(dataLocalPath,"ImagePipeline/");
+    	File parentDir=new File(dataLocalPath);
         
         FileSplit filesInDir = new FileSplit(parentDir, allowedExtensions, randNumGen);
 
@@ -53,8 +57,12 @@ public class DataSetLoader {
         ImageRecordReader trainRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
         ImageRecordReader testRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
 
-        ImageTransform transform = new MultiImageTransform(randNumGen,new ShowImageTransform("Display - before "));
-
+        //ImageTransform transform = new MultiImageTransform(randNumGen,new ShowImageTransform("Display - before "));
+        ImageTransform transform = new MultiImageTransform(randNumGen,
+        		new CropImageTransform(10), new FlipImageTransform(),
+        		new ScaleImageTransform(10), new WarpImageTransform(10),
+        		new ShowImageTransform("Display - before "));
+        
         trainRecordReader.initialize(trainData,transform);
         testRecordReader.initialize(testData,transform);
         int outputNum = trainRecordReader.numLabels();

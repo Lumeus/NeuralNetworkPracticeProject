@@ -32,7 +32,7 @@ public class Network {
 
 	public static void train(String folder, DataSetIterator train, DataSetIterator test) throws Exception {
 		
-        int nChannels = 1; // Number of input channels
+        int nChannels = 3; // Number of input channels
         int outputNum = 4; // The number of possible outcomes
         //int batchSize = 128; // Test batch size
         int nEpochs = 1; // Number of training epochs
@@ -69,13 +69,14 @@ public class Network {
                         .build())
                 .layer(new ConvolutionLayer.Builder(5, 5)
                         //Note that nIn need not be specified in later layers
-                        .stride(1,1)
+                        .kernelSize(2,2)
+                        .stride(2,2)
                         .nOut(50)
                         .activation(Activation.IDENTITY)
                         .build())
                 .layer(new SubsamplingLayer.Builder(PoolingType.MAX)
-                        .kernelSize(2,2)
-                        .stride(2,2)
+                        .kernelSize(4,4)
+                        .stride(8,8)
                         .build())
                 .layer(new DenseLayer.Builder().activation(Activation.RELU)
                         .nOut(500).build())

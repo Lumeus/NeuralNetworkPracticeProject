@@ -35,7 +35,7 @@ public class Network {
         int nChannels = 3; // Number of input channels
         int outputNum = 4; // The number of possible outcomes
         //int batchSize = 128; // Test batch size
-        int nEpochs = 1; // Number of training epochs
+        int nEpochs = 10; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -84,7 +84,7 @@ public class Network {
                         .nOut(outputNum)
                         .activation(Activation.SOFTMAX)
                         .build())
-                .setInputType(InputType.convolutionalFlat(28,28,1)) //See note below
+                .setInputType(InputType.convolutionalFlat(50,50,3)) //See note below
                 .build();
 
         /*

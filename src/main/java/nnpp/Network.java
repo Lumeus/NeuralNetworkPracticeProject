@@ -33,9 +33,9 @@ public class Network {
 	public static void train(String folder, DataSetIterator train, DataSetIterator test) throws Exception {
 		
         int nChannels = 3; // Number of input channels
-        int outputNum = 3; // The number of possible outcomes
+        int outputNum = 4; // The number of possible outcomes
         //int batchSize = 128; // Test batch size
-        int nEpochs = 10; // Number of training epochs
+        int nEpochs = 6; // Number of training epochs
         int seed = 123; //
 
         /*

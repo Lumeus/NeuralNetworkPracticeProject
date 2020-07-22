@@ -9,7 +9,7 @@ public class App {
 
 	public static void main(String[] args) throws Exception {
 
-		String path = "C:\\Users\\Lumeus\\Desktop\\учёба\\Практика\\Data";
+		String path = "C:\\Users\\Lumeus\\Desktop\\учёба\\Практика\\Bad-data";
 		String folder = "C:\\Users\\Lumeus\\Desktop\\учёба\\Практика\\Networks";
 
 

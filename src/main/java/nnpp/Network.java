@@ -35,7 +35,7 @@ public class Network {
         int nChannels = 3; // Number of input channels
         int outputNum = 4; // The number of possible outcomes
         //int batchSize = 128; // Test batch size
-        int nEpochs = 1; // Number of training epochs
+        int nEpochs = 6; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -67,16 +67,26 @@ public class Network {
                         .kernelSize(2,2)
                         .stride(2,2)
                         .build())
-                .layer(new ConvolutionLayer.Builder(5, 5)
+                .layer(new ConvolutionLayer.Builder(3, 3)
                         //Note that nIn need not be specified in later layers
-                        .kernelSize(2,2)
-                        .stride(2,2)
+                        .stride(1,1)
                         .nOut(50)
                         .activation(Activation.IDENTITY)
                         .build())
                 .layer(new SubsamplingLayer.Builder(PoolingType.MAX)
-                        .kernelSize(4,4)
-                        .stride(8,8)
+                        .kernelSize(2,2)
+                        .stride(1,1)
+                        .build())
+                .layer(new ConvolutionLayer.Builder(5, 5)
+                        //Note that nIn need not be specified in later layers
+                        .kernelSize(2,2)
+                        .stride(2,2)
+                        .nOut(100)
+                        .activation(Activation.IDENTITY)
+                        .build())
+                .layer(new SubsamplingLayer.Builder(PoolingType.MAX)
+                        .kernelSize(2,2)
+                        .stride(1,1)
                         .build())
                 .layer(new DenseLayer.Builder().activation(Activation.RELU)
                         .nOut(500).build())
@@ -84,7 +94,7 @@ public class Network {
                         .nOut(outputNum)
                         .activation(Activation.SOFTMAX)
                         .build())
-                .setInputType(InputType.convolutionalFlat(28,28,1)) //See note below
+                .setInputType(InputType.convolutionalFlat(50,50,3)) //See note below
                 .build();
 
         /*

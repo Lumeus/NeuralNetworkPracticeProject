@@ -66,7 +66,7 @@ public class DataSetLoader {
         trainRecordReader.initialize(trainData,transform);
         testRecordReader.initialize(testData,transform);
         int outputNum = trainRecordReader.numLabels();
-        int batchSize = 128; // Minibatch size. Here: The number of images to fetch for each call to dataIter.next().
+        int batchSize = 32; // Minibatch size. Here: The number of images to fetch for each call to dataIter.next().
         int labelIndex = 1; // Index of the label Writable (usually an IntWritable), as obtained by recordReader.next()
         
         trainIter = new RecordReaderDataSetIterator(trainRecordReader, batchSize, labelIndex, outputNum);

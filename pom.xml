@@ -88,12 +88,14 @@
 		<artifactId>deeplearning4j-core</artifactId>
 		<version>1.0.0-beta7</version>
 	</dependency>
-	
+
+
 	<dependency>
 		<groupId>org.nd4j</groupId>
-		<artifactId>nd4j-cuda-10.2</artifactId><!-- nd4j-native -->
+		<artifactId>nd4j-native-platform</artifactId>
 		<version>1.0.0-beta7</version>
 	</dependency>
+
   
 </dependencies>
   

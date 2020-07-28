@@ -1,6 +1,5 @@
 package gui;
 
-import com.sun.deploy.panel.JSmartTextArea;
 import com.sun.javafx.iio.ImageFrame;
 import org.datavec.image.loader.NativeImageLoader;
 import org.datavec.image.transform.*;
@@ -22,7 +21,7 @@ public class GUI extends JFrame{
 	private  JButton  btnOpenModel = new JButton("choose model");
 	private  JButton  btnPredict = new JButton("predict");
 	private JTextArea area = new JTextArea(1, 1);
-	private JLabel label = null;
+	private JLabel label = new JLabel();
 
 	public File net = null;
 	public INDArray image = null;
@@ -33,7 +32,7 @@ public class GUI extends JFrame{
 	public GUI (){
 		super("NeuralNetworkPracticeProject");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(400, 100);
+		this.setSize(500, 500);
 		this.setVisible(true);
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout());
@@ -93,6 +92,7 @@ public class GUI extends JFrame{
 				String message = "";
 				INDArray output = model.output(image, false);
 				Integer max = output.argMax().getInt();
+				
 				switch (max){
 					case(0):
 						message = "ГРЕЧКА";
@@ -108,8 +108,11 @@ public class GUI extends JFrame{
 						break;
 				}
 				//JOptionPane.showMessageDialog(null,"На картинке " + message);
-				area.append("На картинке " + message);
-				label = new JLabel(new ImageIcon(image1));
+				area.setText("На картинке " + message);
+				
+				//area.setText(output.toString());
+				label.setIcon(new ImageIcon(image1.getScaledInstance(400, 300, 1)));
+				
 				panel.add(label);
 			}
 		});

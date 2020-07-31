@@ -25,13 +25,13 @@ public class DataSetLoader {
 
     private static final String [] allowedExtensions = BaseImageLoader.ALLOWED_FORMATS;
 
-    private static final long seed = 12345;
+    private static final long seed = 12345; // Начальное значение генератора псевдослучайных чисел
 
     private static final Random randNumGen = new Random(seed);
 
     private static final int height = 50; // Высота и ширна, к которым
     private static final int width = 50; // приводятся изображения
-    private static final int channels = 3; // цветность изображений
+    private static final int channels = 3; // Цветность изображений
     
     // Итераторы
     private DataSetIterator trainIter;
@@ -61,7 +61,7 @@ public class DataSetLoader {
         InputSplit trainData = filesInDirSplit[0];
         InputSplit testData = filesInDirSplit[1];
         
-        // Объекты сопоставляющие изображения и классы
+        // Объекты, сопоставляющие изображения и классы
         ImageRecordReader trainRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
         ImageRecordReader testRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
 
@@ -77,7 +77,7 @@ public class DataSetLoader {
         
         int outputNum = trainRecordReader.numLabels(); // Число классов
         int batchSize = 32; // Размер минибатча
-        int labelIndex = 1; // 
+        int labelIndex = 1; // Уникальный идентификатор набора данных
         
         // Создание итераторов
         trainIter = new RecordReaderDataSetIterator(trainRecordReader, batchSize, labelIndex, outputNum);

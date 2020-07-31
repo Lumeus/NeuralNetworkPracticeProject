@@ -23,7 +23,7 @@ public class GUI extends JFrame{
 	private JLabel label = new JLabel(); // Поле вывода изображения
 
 	public File net = null; // Файл конфигурации модели
-	public INDArray image = null; // Массив даннэх для модели
+	public INDArray image = null; // Массив данных для модели
 	public Image image1 = null; // Изображение для вывода
 	public MultiLayerNetwork model = null; // Модель
 	NativeImageLoader loader = new NativeImageLoader(50, 50, 3); // Загрузчик

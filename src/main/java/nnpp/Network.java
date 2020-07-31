@@ -33,7 +33,7 @@ public class Network {
         int nChannels = 3; // Число входных каналов (зависит от цветности изображения)
         int outputNum = 4; // Число выходов, т.е. классов
         int nEpochs = 10; // Число эпох тренировки
-        int seed = 123; //
+        int seed = 123; // Начальное значение генератора псевдослучайных чисел
         
         log.info("Build model....");
         // Конфигурация модели
@@ -43,7 +43,7 @@ public class Network {
                 .weightInit(WeightInit.XAVIER) // Начальное распределение весов
                 .updater(new Adam(1e-3)) // Метод обновления весов
                 .list() // Слои
-                // Свёрточный с я дром 5х5, шагом 1 и 20 выходными каналами
+                // Свёрточный с ядром 5х5, шагом 1 и 20 выходными каналами
                 .layer(new ConvolutionLayer.Builder(5, 5)
                         .nIn(nChannels)
                         .stride(1,1)
@@ -55,7 +55,7 @@ public class Network {
                         .kernelSize(2,2)
                         .stride(2,2)
                         .build())
-                // Свёрточный с я дром 3х3, шагом 1 и 50 выходными каналами
+                // Свёрточный с ядром 3х3, шагом 1 и 50 выходными каналами
                 .layer(new ConvolutionLayer.Builder(3, 3)
                         //Note that nIn need not be specified in later layers
                         .stride(1,1)
@@ -67,7 +67,7 @@ public class Network {
                         .kernelSize(2,2)
                         .stride(1,1)
                         .build())
-                // Свёрточный с я дром 5х5, шагом 2 и 100 выходными каналами
+                // Свёрточный с ядром 5х5, шагом 2 и 100 выходными каналами
                 .layer(new ConvolutionLayer.Builder(5, 5)
                         //Note that nIn need not be specified in later layers
                         .kernelSize(2,2)

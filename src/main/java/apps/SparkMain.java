@@ -1,42 +1,70 @@
-// Класс, тренирующий нейронную сеть
+package apps;
 
-package nnpp;
-
-import java.io.File;
+import nnpp.DataSetLoader;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
-import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
+import org.deeplearning4j.nn.conf.layers.*;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.api.InvocationType;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.spark.api.TrainingMaster;
+import org.deeplearning4j.spark.impl.multilayer.SparkDl4jMultiLayer;
+import org.deeplearning4j.spark.impl.paramavg.ParameterAveragingTrainingMaster;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class Network {
-	
-	private static final Logger log = LoggerFactory.getLogger(Network.class);
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-	public void train(String folder, DataSetIterator train, DataSetIterator test) throws Exception {
-		
+public class SparkMain {
+    public static void main(String[] args) throws Exception {
+        // Путь к набору данных (для каждого класса отдельная папка с изображениями)
+        //String path = "C:\\Users\\Lumeus\\Desktop\\учёба\\Практика\\New_data";
+        String path = "D:\\учёба\\Практика\\New_data";
+        // Путь к папке, в которую сохраняется итоговая конфигурация сети
+        //String folder = "C:\\Users\\Lumeus\\Desktop\\учёба\\Практика\\Networks";
+        String folder = "D:\\учёба\\Практика\\Networks";
+
+        // Загрузка данных
+        DataSetLoader data = new DataSetLoader();
+        data.loadData(path);
+
+        // Получение тренировочного и тестового итераторов
+        DataSetIterator trainIter = data.getTrainIter();
+        // DataSetIterator testIter = data.getTestIter();
+
+
+        JavaSparkContext sc = new JavaSparkContext("local[2]", "NNPP");
+
+
+//        SparkSession spark = SparkSession.builder().sparkContext(sc.sc()).getOrCreate();
+//        Dataset<Row> imagesDF = spark.read().format("image").option("dropInvalid", true).load("data/mllib/images/origin/kittens");
+//        imagesDF.select("image.origin", "image.width", "image.height").show(false);
+//        JavaRDD<DataSet> trainingData = imagesDF;
+
+        List<DataSet> list = new ArrayList<DataSet>();
+        while (trainIter.hasNext()) {
+            list.add(trainIter.next());
+        }
+
+        JavaRDD<DataSet> trainingData = sc.parallelize(list);
+
         int nChannels = 3; // Число входных каналов (зависит от цветности изображения)
         int outputNum = 4; // Число выходов, т.е. классов
-        int nEpochs = 3; // Число эпох тренировки
+        int nEpochs = 1; // Число эпох тренировки
         int seed = 123; // Начальное значение генератора псевдослучайных чисел
-        
-        log.info("Build model....");
-        // Конфигурация модели
+
+//Model setup as on a single node. Either a MultiLayerConfiguration or a ComputationGraphConfiguration
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .l2(0.0005) // Регуляризация
@@ -88,24 +116,23 @@ public class Network {
                 // Установка параметров входных данных
                 .setInputType(InputType.convolutionalFlat(50,50,3))
                 .build();
-        
-        // Создание модели
-        MultiLayerNetwork model = new MultiLayerNetwork(conf);
-        model.init();
-        
-        log.info("Train model...");
-        // Тренировка модели
-        model.setListeners(new ScoreIterationListener(10), new EvaluativeListener(test, 1, InvocationType.EPOCH_END)); //Print score every 10 iterations and evaluate on test set every epoch
-        model.fit(train, nEpochs);
-        
-        // Полное имя архива для сохранения модели
-        String path = FilenameUtils.concat(folder, "nnpp.zip");
-        
-        log.info("Saving model to "+path);
-        // Сохранение модели
-        model.save(new File(path), true);
-        
-        log.info("****************Training finished********************");
-	}
-	
+
+//Create the TrainingMaster instance
+        int examplesPerDataSetObject = 1;
+        TrainingMaster trainingMaster = new ParameterAveragingTrainingMaster.Builder(examplesPerDataSetObject)
+                .build();
+
+//Create the SparkDl4jMultiLayer instance and fit the network using the training data:
+        SparkDl4jMultiLayer sparkNetwork = new SparkDl4jMultiLayer(sc, conf, trainingMaster);
+
+//Execute training:
+        for (int i = 0; i < nEpochs; i++) {
+            sparkNetwork.fit(trainingData);
+        }
+
+        MultiLayerNetwork model = sparkNetwork.getNetwork();
+
+        String savePath = FilenameUtils.concat(folder, "nnpp.zip");
+        model.save(new File(savePath), true);
+    }
 }

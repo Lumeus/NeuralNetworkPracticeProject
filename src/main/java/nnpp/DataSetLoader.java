@@ -29,8 +29,8 @@ public class DataSetLoader {
 
     private static final Random randNumGen = new Random(seed);
 
-    private static final int height = 50; // Высота и ширна, к которым
-    private static final int width = 50; // приводятся изображения
+    private static final int height = 32; // Высота и ширна, к которым
+    private static final int width = 32; // приводятся изображения
     private static final int channels = 3; // Цветность изображений
     
     // Итераторы
@@ -76,7 +76,7 @@ public class DataSetLoader {
         testRecordReader.initialize(testData,transform);
         
         int outputNum = trainRecordReader.numLabels(); // Число классов
-        int batchSize = 32; // Размер минибатча
+        int batchSize = 16; // Размер минибатча
         int labelIndex = 1; // Уникальный идентификатор набора данных
         
         // Создание итераторов
